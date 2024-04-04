@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#define TEST_PASSED() printf("[PASSED] %s\n", __FILE__)
+
 #ifdef _DEBUG
 #define DEBUG_PRINT(format, ...)            \
     printf("%s:%d - ", __FILE__, __LINE__); \
@@ -22,12 +24,24 @@ void AssertMallocCountIsZero();
 #define DEBUG_INCREASE_MALLOC_COUNT() IncreaseMallocCount()
 #define DEBUG_DECREASE_MALLOC_COUNT() DecreaseMallocCount()
 #define DEBUG_ASSERT_MALLOC_COUNT_ZERO() AssertMallocCountIsZero()
+
+#define MALLOC(size) \
+    malloc(size);    \
+    DEBUG_INCREASE_MALLOC_COUNT()
+#define FREE(ptr) \
+    free(ptr);    \
+    DEBUG_DECREASE_MALLOC_COUNT()
+#else
+#define MALLOC(size) malloc(size)
+#define FREE(ptr) free(ptr)
 #endif
 
 #else
 // MCU specific headers below
 
 // MCU specific headers above
+
+#define TEST_PASSED()
 
 #ifdef _DEBUG
 // Change the Debug print below to match the MCU
@@ -38,6 +52,8 @@ void AssertMallocCountIsZero();
 #define DEBUG_INCREASE_MALLOC_COUNT()
 #define DEBUG_DECREASE_MALLOC_COUNT()
 #define DEBUG_ASSERT_MALLOC_COUNT_ZERO()
+#define MALLOC(size) malloc(size)
+#define FREE(ptr) free(ptr)
 #endif
 
 #endif

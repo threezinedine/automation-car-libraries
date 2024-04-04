@@ -30,6 +30,11 @@ void LinkList_ForEach(LinkList_Instance *instance,
                       LinkList_ForEachCallbackType foreach,
                       void *context);
 
+void *LinkList_GetNodeDataByIndex(LinkList_Instance *instance, uint32_t index);
+void LinkList_RemoveNodeByIndex(LinkList_Instance *instance, uint32_t index);
+
+uint32_t LinkList_Count(LinkList_Instance *instance);
+
 void LinkList_Clear(LinkList_Instance *instance);
 
 void LinkList_Release(LinkList_Instance *instance);

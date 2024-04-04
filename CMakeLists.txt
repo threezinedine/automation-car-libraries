@@ -14,6 +14,7 @@ set(
     LIBRARY_FOLDERS
     Common
     LinkList
+    Queue
 )
 
 foreach(LIBRARY_FOLDER ${LIBRARY_FOLDERS})

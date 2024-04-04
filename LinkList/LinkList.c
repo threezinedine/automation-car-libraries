@@ -2,8 +2,7 @@
 
 LinkList_Instance *LinkList_Init()
 {
-    LinkList_Instance *instance = (LinkList_Instance *)malloc(sizeof(LinkList_Instance));
-    DEBUG_INCREASE_MALLOC_COUNT();
+    LinkList_Instance *instance = (LinkList_Instance *)MALLOC(sizeof(LinkList_Instance));
 
     instance->head = NULL;
     instance->tail = NULL;
@@ -22,8 +21,7 @@ void LinkList_SetFreeDataCallback(LinkList_Instance *instance,
 
 void LinkList_AddNode(LinkList_Instance *instance, void *data)
 {
-    LinkList_Node *newNode = (LinkList_Node *)malloc(sizeof(LinkList_Node));
-    DEBUG_INCREASE_MALLOC_COUNT();
+    LinkList_Node *newNode = (LinkList_Node *)MALLOC(sizeof(LinkList_Node));
 
     newNode->data = data;
     newNode->next = NULL;
@@ -71,8 +69,7 @@ void LinkList_Clear(LinkList_Instance *instance)
             instance->freeDataCallback(current->data);
         }
 
-        free(current);
-        DEBUG_DECREASE_MALLOC_COUNT();
+        FREE(current);
         current = next;
     }
 
@@ -81,6 +78,68 @@ void LinkList_Clear(LinkList_Instance *instance)
     instance->count = 0;
 
     return;
+}
+
+void *LinkList_GetNodeDataByIndex(LinkList_Instance *ins, uint32_t index)
+{
+    uint32_t temp = 0;
+    LinkList_Node *current = ins->head;
+
+    while (current != NULL)
+    {
+        if (temp == index)
+        {
+            return current->data;
+        }
+
+        current = current->next;
+
+        temp++;
+    }
+    return NULL;
+}
+
+void LinkList_RemoveNodeByIndex(LinkList_Instance *ins, uint32_t index)
+{
+    uint32_t temp = 0;
+    LinkList_Node *current = ins->head;
+    LinkList_Node *previous = ins->head;
+
+    if (index == 0)
+    {
+        if (ins->head == NULL)
+        {
+            return;
+        }
+        LinkList_Node *temp = ins->head;
+        ins->head = ins->head->next;
+        ins->count--;
+        ins->freeDataCallback(temp->data);
+        FREE(temp);
+        return;
+    }
+
+    while (current != NULL && temp != index)
+    {
+        previous = current;
+        current = current->next;
+        temp++;
+    }
+
+    if (current != NULL && previous != NULL && temp == index)
+    {
+        previous->next = current->next;
+        ins->count--;
+        ins->freeDataCallback(current->data);
+        FREE(current);
+    }
+
+    return;
+}
+
+uint32_t LinkList_Count(LinkList_Instance *instance)
+{
+    return instance->count;
 }
 
 void LinkList_Release(LinkList_Instance *instance)
@@ -96,13 +155,11 @@ void LinkList_Release(LinkList_Instance *instance)
             instance->freeDataCallback(current->data);
         }
 
-        free(current);
-        DEBUG_DECREASE_MALLOC_COUNT();
+        FREE(current);
         current = next;
     }
 
-    free(instance);
-    DEBUG_DECREASE_MALLOC_COUNT();
+    FREE(instance);
 
     return;
 }
